@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil_plus/flutter_screenutil_plus.dart';
 import 'package:get/get.dart';
 
+import 'all_binding.dart';
+import 'all_route.dart';
+
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -16,6 +19,9 @@ class MyApp extends StatelessWidget {
         return GetMaterialApp(
           debugShowCheckedModeBanner: false,
           title: 'AI ChatApp',
+          initialBinding: AllBinding(),
+          initialRoute: AllRoute.home,
+          getPages: AllRoute.routes,
           theme: ThemeData(
             useMaterial3: true,
             colorScheme: ColorScheme.fromSeed(
