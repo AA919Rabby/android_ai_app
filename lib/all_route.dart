@@ -1,6 +1,6 @@
-import 'package:ai_chatapp/presentation/home/ui/screen/home_screen.dart';
-import 'package:get/get.dart';
 import 'package:ai_chatapp/all_binding.dart';
+import 'package:get/get.dart';
+import 'package:ai_chatapp/presentation/home/ui/screen/home_screen.dart';
 
 class AllRoute {
   static const String home = '/home';
