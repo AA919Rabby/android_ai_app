@@ -5,8 +5,6 @@ import 'package:get/get.dart';
 import 'package:ai_chatapp/core/global/custom_text.dart';
 import 'package:ai_chatapp/presentation/home/controller/home_controller.dart';
 
-import 'model_selector.dart';
-
 class ChatInput extends GetView<HomeController> {
   const ChatInput({super.key});
 
@@ -23,10 +21,10 @@ class ChatInput extends GetView<HomeController> {
             10.h,
           ),
           decoration: BoxDecoration(
-            color: Colors.grey.shade100,
+            color: const Color(0xFF2A2B3D), // Dark surface color
             borderRadius: BorderRadius.circular(26.r),
             border: Border.all(
-              color: Colors.grey.shade200,
+              color: const Color(0xFF4285F4),
             ),
           ),
           child: Column(
@@ -40,13 +38,13 @@ class ChatInput extends GetView<HomeController> {
                 style: TextStyle(
                   fontSize: 15.sp,
                   fontFamily: 'Poppins',
-                  color: Colors.black87,
+                  color: Colors.white, // White text for nightmode
                 ),
                 decoration: InputDecoration(
                   hintText: 'Ask anything',
                   hintStyle: TextStyle(
                     fontSize: 15.sp,
-                    color: Colors.grey.shade500,
+                    color: Colors.white54, // Lighter hint text
                     fontFamily: 'Poppins',
                   ),
                   border: InputBorder.none,
@@ -57,21 +55,20 @@ class ChatInput extends GetView<HomeController> {
                   ),
                 ),
               ),
-              Gap(8),
+              const Gap(8),
               Row(
                 children: [
                   _ActionButton(
                     icon: Icons.add_rounded,
                     onTap: controller.attachFile,
                   ),
-                  Gap(6),
-
+                  const Gap(6),
                   const Spacer(),
                   _ActionButton(
                     icon: Icons.mic_none_rounded,
                     onTap: controller.startVoiceInput,
                   ),
-                  Gap(4),
+                  const Gap(4),
                   _SendButton(
                     enabled: controller.hasMessage,
                     onTap: controller.sendMessage,
@@ -108,13 +105,13 @@ class _ActionButton extends StatelessWidget {
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             border: Border.all(
-              color: Colors.grey.shade300,
+              color: const Color(0xFF45475A), // Dark border
             ),
           ),
           child: Icon(
             icon,
             size: 21.r,
-            color: Colors.black87,
+            color: Colors.white, // White icon
           ),
         ),
       ),
@@ -150,13 +147,13 @@ class _ModelButton extends StatelessWidget {
                 text: model,
                 fontSize: 13.sp,
                 fontWeight: FontWeight.w500,
-                color: Colors.black87,
+                color: Colors.white,
               ),
-              Gap(2),
+              const Gap(2),
               Icon(
                 Icons.keyboard_arrow_down_rounded,
                 size: 18.r,
-                color: Colors.black54,
+                color: Colors.white70,
               ),
             ],
           ),
@@ -183,7 +180,7 @@ class _SendButton extends StatelessWidget {
       height: 38.r,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: enabled ? Colors.black87 : Colors.grey.shade300,
+        color: enabled ? const Color(0xFF4285F4) : const Color(0xFF45475A), // Blue when active, dark grey disabled
       ),
       child: Material(
         color: Colors.transparent,
@@ -193,7 +190,7 @@ class _SendButton extends StatelessWidget {
           child: Icon(
             Icons.arrow_upward_rounded,
             size: 21.r,
-            color: enabled ? Colors.white : Colors.grey.shade500,
+            color: enabled ? Colors.white : Colors.white54,
           ),
         ),
       ),

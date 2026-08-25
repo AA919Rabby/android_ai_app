@@ -15,7 +15,7 @@ class HomeScreen extends GetView<HomeController> {
   Widget build(BuildContext context) {
     return Scaffold(
       drawer: const CustomDrawer(),
-      backgroundColor: Colors.white,
+      backgroundColor: const Color(0xFF1E1E2E), // Base Dark background
       body: SafeArea(
         child: Builder(
           builder: (scaffoldContext) {

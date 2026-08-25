@@ -40,7 +40,7 @@ class WelcomeContent extends StatelessWidget {
             text: 'Hello, there',
             fontSize: 28.sp,
             fontWeight: FontWeight.w600,
-            color: Colors.black87,
+            color: Colors.white, // White text
             textAlign: TextAlign.center,
           ),
           const Gap(8),
@@ -48,7 +48,7 @@ class WelcomeContent extends StatelessWidget {
             text: 'How can I help you today?',
             fontSize: 16.sp,
             fontWeight: FontWeight.w400,
-            color: Colors.grey.shade600,
+            color: Colors.white70, // Slightly dim text
             textAlign: TextAlign.center,
           ),
         ],

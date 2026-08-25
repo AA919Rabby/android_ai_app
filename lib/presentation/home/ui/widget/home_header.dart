@@ -25,7 +25,7 @@ class HomeHeader extends StatelessWidget {
               child: Icon(
                 Icons.menu_rounded,
                 size: 25.r,
-                color: Colors.black87,
+                color: Colors.white, // White icon
               ),
             ),
           ),
@@ -56,7 +56,7 @@ class HomeHeader extends StatelessWidget {
           text: 'Gemini X',
           fontSize: 18.sp,
           fontWeight: FontWeight.w600,
-          color: Colors.black87,
+          color: Colors.white, // White text
         ),
         const Spacer(),
       ],

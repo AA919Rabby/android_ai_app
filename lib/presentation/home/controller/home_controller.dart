@@ -69,6 +69,7 @@ class HomeController extends GetxController {
     messageController.removeListener(_onTextChanged);
     messageController.dispose();
     messageFocusNode.dispose();
+
     super.onClose();
   }
 }

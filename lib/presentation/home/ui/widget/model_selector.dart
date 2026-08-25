@@ -18,7 +18,7 @@ class ModelSelector extends GetView<HomeController> {
         24.h,
       ),
       decoration: const BoxDecoration(
-        color: Colors.white,
+        color: Color(0xFF1E1E2E), // Base Dark background
         borderRadius: BorderRadius.vertical(
           top: Radius.circular(24),
         ),
@@ -31,21 +31,21 @@ class ModelSelector extends GetView<HomeController> {
               width: 42.w,
               height: 4.h,
               decoration: BoxDecoration(
-                color: Colors.grey.shade300,
+                color: const Color(0xFF45475A), // Dark drag handle
                 borderRadius: BorderRadius.circular(10.r),
               ),
             ),
-            Gap(20),
+            const Gap(20),
             Align(
               alignment: Alignment.centerLeft,
               child: CustomText(
                 text: 'Choose model',
                 fontSize: 19.sp,
                 fontWeight: FontWeight.w600,
-                color: Colors.black87,
+                color: Colors.white,
               ),
             ),
-            Gap(12),
+            const Gap(12),
             ...controller.models.map(
                   (model) => Obx(
                     () => _ModelItem(
@@ -95,13 +95,13 @@ class _ModelItem extends StatelessWidget {
           ),
           decoration: BoxDecoration(
             color: selected
-                ? Colors.blue.withValues(alpha: 0.08)
-                : Colors.grey.shade50,
+                ? Colors.blue.withValues(alpha: 0.15)
+                : const Color(0xFF2A2B3D), // Dark surface for unselected
             borderRadius: BorderRadius.circular(14.r),
             border: Border.all(
               color: selected
                   ? Colors.blue
-                  : Colors.grey.shade200,
+                  : const Color(0xFF45475A),
             ),
           ),
           child: Row(
@@ -113,14 +113,14 @@ class _ModelItem extends StatelessWidget {
                   shape: BoxShape.circle,
                   color: selected
                       ? Colors.blue
-                      : Colors.grey.shade200,
+                      : const Color(0xFF313244), // Slightly lighter circle
                 ),
                 child: Icon(
                   Icons.auto_awesome_rounded,
                   size: 19.r,
                   color: selected
                       ? Colors.white
-                      : Colors.black54,
+                      : Colors.white70,
                 ),
               ),
               const Gap(12),
@@ -128,7 +128,7 @@ class _ModelItem extends StatelessWidget {
                 text: model,
                 fontSize: 15.sp,
                 fontWeight: FontWeight.w500,
-                color: Colors.black87,
+                color: Colors.white,
               ),
               const Spacer(),
               if (selected)

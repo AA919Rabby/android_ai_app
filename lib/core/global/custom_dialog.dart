@@ -1,4 +1,317 @@
+// import 'package:flutter/material.dart';
+// import 'package:flutter_gap/flutter_gap.dart';
+// import 'package:flutter_screenutil_plus/flutter_screenutil_plus.dart';
+//
+// class CustomDialog extends StatelessWidget {
+//   final String? image;
+//   final Widget? imageWidget;
+//   final String? title;
+//   final String? message;
+//   final Widget? content;
+//   final String? confirmText;
+//   final String? cancelText;
+//   final Color? confirmColor;
+//   final Color? cancelColor;
+//   final Color? titleColor;
+//   final Color? messageColor;
+//   final Color? backgroundColor;
+//   final VoidCallback? onConfirm;
+//   final VoidCallback? onCancel;
+//   final bool showConfirmButton;
+//   final bool showCancelButton;
+//   final bool barrierDismissible;
+//   final double? imageSize;
+//   final double? borderRadius;
+//   final EdgeInsetsGeometry? padding;
+//
+//   const CustomDialog({
+//     super.key,
+//     this.image,
+//     this.imageWidget,
+//     this.title,
+//     this.message,
+//     this.content,
+//     this.confirmText = 'Yes',
+//     this.cancelText = 'No',
+//     this.confirmColor = const Color(0xFFFF3B30),
+//     this.cancelColor = const Color(0xFF1D1D1F),
+//     this.titleColor = const Color(0xFF1D1D1F),
+//     this.messageColor = const Color(0xFF6E6E73),
+//     this.backgroundColor = Colors.white,
+//     this.onConfirm,
+//     this.onCancel,
+//     this.showConfirmButton = true,
+//     this.showCancelButton = true,
+//     this.barrierDismissible = true,
+//     this.imageSize,
+//     this.borderRadius = 24,
+//     this.padding,
+//   });
+//
+//   Widget _buildDefaultIcon() {
+//     return Container(
+//       width: 64.r,
+//       height: 64.r,
+//       decoration: const BoxDecoration(
+//         color: Color(0xFFFFF1F0),
+//         shape: BoxShape.circle,
+//       ),
+//       child: Icon(
+//         Icons.logout_rounded,
+//         color: Color(0xFFFF3B30),
+//         size: 30.r,
+//       ),
+//     );
+//   }
+//
+//   Widget? _buildImage() {
+//     if (imageWidget != null) {
+//       return imageWidget;
+//     }
+//
+//     if (image != null && image!.isNotEmpty) {
+//       return Container(
+//         width: imageSize ?? 64.r,
+//         height: imageSize ?? 64.r,
+//         decoration: BoxDecoration(
+//           borderRadius: BorderRadius.circular(18.r),
+//         ),
+//         clipBehavior: Clip.antiAlias,
+//         child: Image.network(
+//           image!,
+//           fit: BoxFit.cover,
+//         ),
+//       );
+//     }
+//
+//     return _buildDefaultIcon();
+//   }
+//
+//   Widget _buildCancelButton(BuildContext context) {
+//     return Expanded(
+//       child: SizedBox(
+//         height: 52.r,
+//         child: OutlinedButton(
+//           onPressed: onCancel ?? () => Navigator.of(context).pop(),
+//           style: OutlinedButton.styleFrom(
+//             foregroundColor: cancelColor,
+//             backgroundColor: Colors.white,
+//             elevation: 0,
+//             padding: EdgeInsets.zero,
+//             side: BorderSide(
+//               color: const Color(0xFFD2D2D7),
+//               width: 1.r,
+//             ),
+//             shape: RoundedRectangleBorder(
+//               borderRadius: BorderRadius.circular(16.r),
+//             ),
+//           ),
+//           child: Text(
+//             cancelText ?? 'No',
+//             style: TextStyle(
+//               fontSize: 16.sp,
+//               fontWeight: FontWeight.w600,
+//               letterSpacing: -0.2,
+//             ),
+//           ),
+//         ),
+//       ),
+//     );
+//   }
+//
+//   Widget _buildConfirmButton(BuildContext context) {
+//     return Expanded(
+//       child: SizedBox(
+//         height: 52.r,
+//         child: ElevatedButton(
+//           onPressed: onConfirm ?? () => Navigator.of(context).pop(),
+//           style: ElevatedButton.styleFrom(
+//             backgroundColor: confirmColor,
+//             foregroundColor: Colors.white,
+//             elevation: 0,
+//             padding: EdgeInsets.zero,
+//             shadowColor: Colors.transparent,
+//             shape: RoundedRectangleBorder(
+//               borderRadius: BorderRadius.circular(16.r),
+//             ),
+//           ),
+//           child: Text(
+//             confirmText ?? 'Yes',
+//             style: TextStyle(
+//               fontSize: 16.sp,
+//               fontWeight: FontWeight.w600,
+//               letterSpacing: -0.2,
+//             ),
+//           ),
+//         ),
+//       ),
+//     );
+//   }
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     final Widget? topImage = _buildImage();
+//
+//     return Dialog(
+//       backgroundColor: Colors.transparent,
+//       elevation: 0,
+//       insetPadding: EdgeInsets.symmetric(
+//         horizontal: 24.w,
+//         vertical: 24.h,
+//       ),
+//       child: ConstrainedBox(
+//         constraints: BoxConstraints(
+//           maxWidth: 520.w,
+//         ),
+//         child: Container(
+//           decoration: BoxDecoration(
+//             color: backgroundColor,
+//             borderRadius: BorderRadius.circular(
+//               borderRadius ?? 24.r,
+//             ),
+//             boxShadow: [
+//               BoxShadow(
+//                 color: Colors.black.withValues(alpha: 0.12),
+//                 blurRadius: 40.r,
+//                 offset: Offset(0, 16.r),
+//               ),
+//             ],
+//           ),
+//           child: Padding(
+//             padding: padding ??
+//                 EdgeInsets.symmetric(
+//                   horizontal: 24.w,
+//                   vertical: 26.h,
+//                 ),
+//             child: Column(
+//               mainAxisSize: MainAxisSize.min,
+//               children: [
+//                 if (topImage != null) ...[
+//                   topImage,
+//                   const Gap(18),
+//                 ],
+//                 if (title != null) ...[
+//                   Text(
+//                     title!,
+//                     textAlign: TextAlign.center,
+//                     style: TextStyle(
+//                       fontSize: 22.sp,
+//                       fontWeight: FontWeight.w700,
+//                       height: 1.15,
+//                       letterSpacing: -0.5,
+//                       color: titleColor,
+//                     ),
+//                   ),
+//                   const Gap(10),
+//                 ],
+//                 if (message != null) ...[
+//                   Text(
+//                     message!,
+//                     textAlign: TextAlign.center,
+//                     style: TextStyle(
+//                       fontSize: 16.sp,
+//                       fontWeight: FontWeight.w400,
+//                       height: 1.4,
+//                       letterSpacing: -0.1,
+//                       color: messageColor,
+//                     ),
+//                   ),
+//                   const Gap(24),
+//                 ],
+//                 if (content != null) ...[
+//                   content!,
+//                   const Gap(24),
+//                 ],
+//                 if (showConfirmButton || showCancelButton)
+//                   Row(
+//                     children: [
+//                       if (showCancelButton)
+//                         _buildCancelButton(context),
+//                       if (showCancelButton &&
+//                           showConfirmButton)
+//                         const Gap(10),
+//                       if (showConfirmButton)
+//                         _buildConfirmButton(context),
+//                     ],
+//                   ),
+//               ],
+//             ),
+//           ),
+//         ),
+//       ),
+//     );
+//   }
+//
+//   static Future<T?> show<T>({
+//     required BuildContext context,
+//     String? image,
+//     Widget? imageWidget,
+//     String? title,
+//     String? message,
+//     Widget? content,
+//     String? confirmText,
+//     String? cancelText,
+//     Color? confirmColor,
+//     Color? cancelColor,
+//     Color? titleColor,
+//     Color? messageColor,
+//     Color? backgroundColor,
+//     VoidCallback? onConfirm,
+//     VoidCallback? onCancel,
+//     bool? showConfirmButton,
+//     bool? showCancelButton,
+//     bool barrierDismissible = true,
+//     double? imageSize,
+//     double? borderRadius,
+//     EdgeInsetsGeometry? padding,
+//   }) {
+//     return showDialog<T>(
+//       context: context,
+//       barrierDismissible: barrierDismissible,
+//       barrierColor: Colors.black.withValues(alpha: 0.48),
+//       builder: (context) {
+//         return CustomDialog(
+//           image: image,
+//           imageWidget: imageWidget,
+//           title: title,
+//           message: message,
+//           content: content,
+//           confirmText: confirmText ?? 'Yes',
+//           cancelText: cancelText ?? 'No',
+//           confirmColor:
+//           confirmColor ?? const Color(0xFFFF3B30),
+//           cancelColor:
+//           cancelColor ?? const Color(0xFF1D1D1F),
+//           titleColor:
+//           titleColor ?? const Color(0xFF1D1D1F),
+//           messageColor:
+//           messageColor ?? const Color(0xFF6E6E73),
+//           backgroundColor:
+//           backgroundColor ?? Colors.white,
+//           onConfirm: onConfirm,
+//           onCancel: onCancel,
+//           showConfirmButton:
+//           showConfirmButton ?? true,
+//           showCancelButton:
+//           showCancelButton ?? true,
+//           barrierDismissible: barrierDismissible,
+//           imageSize: imageSize,
+//           borderRadius: borderRadius ?? 24.r,
+//           padding: padding,
+//         );
+//       },
+//     );
+//   }
+// }
+
+
+
+
+/// this on eis the ai chatapp naimationed related dialog
+///
+
 import 'package:flutter/material.dart';
+import 'package:flutter_gap/flutter_gap.dart';
 import 'package:flutter_screenutil_plus/flutter_screenutil_plus.dart';
 
 class CustomDialog extends StatelessWidget {
@@ -30,22 +343,38 @@ class CustomDialog extends StatelessWidget {
     this.title,
     this.message,
     this.content,
-    this.confirmText,
-    this.cancelText,
-    this.confirmColor,
-    this.cancelColor,
-    this.titleColor,
-    this.messageColor,
-    this.backgroundColor,
+    this.confirmText = 'Yes',
+    this.cancelText = 'No',
+    this.confirmColor = const Color(0xFF4285F4),
+    this.cancelColor = Colors.white, // Updated default for dark mode
+    this.titleColor = Colors.white, // Updated default for dark mode
+    this.messageColor = Colors.white70, // Updated default for dark mode
+    this.backgroundColor = const Color(0xFF2A2B3D), // Updated default background for dark mode
     this.onConfirm,
     this.onCancel,
     this.showConfirmButton = true,
-    this.showCancelButton = false,
+    this.showCancelButton = true,
     this.barrierDismissible = true,
     this.imageSize,
-    this.borderRadius,
+    this.borderRadius = 24,
     this.padding,
   });
+
+  Widget _buildDefaultIcon() {
+    return Container(
+      width: 64.r,
+      height: 64.r,
+      decoration: BoxDecoration(
+        color: const Color(0xFFFF3B30).withValues(alpha: 0.15), // Adapted for dark mode
+        shape: BoxShape.circle,
+      ),
+      child: Icon(
+        Icons.logout_rounded,
+        color: const Color(0xFFFF3B30),
+        size: 30.r,
+      ),
+    );
+  }
 
   Widget? _buildImage() {
     if (imageWidget != null) {
@@ -53,18 +382,82 @@ class CustomDialog extends StatelessWidget {
     }
 
     if (image != null && image!.isNotEmpty) {
-      return ClipRRect(
-        borderRadius: BorderRadius.circular(12.r),
+      return Container(
+        width: imageSize ?? 64.r,
+        height: imageSize ?? 64.r,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(18.r),
+        ),
+        clipBehavior: Clip.antiAlias,
         child: Image.network(
           image!,
-          width: imageSize ?? 80.r,
-          height: imageSize ?? 80.r,
           fit: BoxFit.cover,
         ),
       );
     }
 
-    return null;
+    return _buildDefaultIcon();
+  }
+
+  Widget _buildCancelButton(BuildContext context) {
+    return Expanded(
+      child: SizedBox(
+        height: 52.r,
+        child: OutlinedButton(
+          onPressed: onCancel ?? () => Navigator.of(context).pop(),
+          style: OutlinedButton.styleFrom(
+            foregroundColor: cancelColor,
+            backgroundColor: Colors.transparent, // Transparent for dark theme outlines
+            elevation: 0,
+            padding: EdgeInsets.zero,
+            side: BorderSide(
+              color: const Color(0xFF45475A), // Dark mode border
+              width: 1.r,
+            ),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16.r),
+            ),
+          ),
+          child: Text(
+            cancelText ?? 'No',
+            style: TextStyle(
+              fontSize: 16.sp,
+              fontWeight: FontWeight.w600,
+              letterSpacing: -0.2,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildConfirmButton(BuildContext context) {
+    return Expanded(
+      child: SizedBox(
+        height: 52.r,
+        child: ElevatedButton(
+          onPressed: onConfirm ?? () => Navigator.of(context).pop(),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: confirmColor,
+            foregroundColor: Colors.white,
+            elevation: 0,
+            padding: EdgeInsets.zero,
+            shadowColor: Colors.transparent,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16.r),
+            ),
+          ),
+          child: Text(
+            confirmText ?? 'Yes',
+            style: TextStyle(
+              fontSize: 16.sp,
+              fontWeight: FontWeight.w600,
+              letterSpacing: -0.2,
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   @override
@@ -72,111 +465,90 @@ class CustomDialog extends StatelessWidget {
     final Widget? topImage = _buildImage();
 
     return Dialog(
-      backgroundColor: backgroundColor ?? Colors.white,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(
-          borderRadius ?? 20.r,
-        ),
+      backgroundColor: Colors.transparent,
+      elevation: 0,
+      insetPadding: EdgeInsets.symmetric(
+        horizontal: 24.w,
+        vertical: 24.h,
       ),
-      child: Padding(
-        padding: padding ??
-            EdgeInsets.symmetric(
-              horizontal: 20.w,
-              vertical: 24.h,
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          maxWidth: 520.w,
+        ),
+        child: Container(
+          decoration: BoxDecoration(
+            color: backgroundColor,
+            borderRadius: BorderRadius.circular(
+              borderRadius ?? 24.r,
             ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            if (topImage != null) ...[
-              topImage,
-              SizedBox(height: 16.h),
-            ],
-            if (title != null) ...[
-              Text(
-                title!,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 20.sp,
-                  fontWeight: FontWeight.w600,
-                  color: titleColor ?? Colors.black,
-                ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.5), // Stronger shadow for dark mode depth
+                blurRadius: 40.r,
+                offset: Offset(0, 16.r),
               ),
-              SizedBox(height: 10.h),
             ],
-            if (message != null) ...[
-              Text(
-                message!,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 14.sp,
-                  color: messageColor ?? Colors.grey.shade700,
+          ),
+          child: Padding(
+            padding: padding ??
+                EdgeInsets.symmetric(
+                  horizontal: 24.w,
+                  vertical: 26.h,
                 ),
-              ),
-              SizedBox(height: 20.h),
-            ],
-            if (content != null) ...[
-              content!,
-              SizedBox(height: 20.h),
-            ],
-            if (showConfirmButton || showCancelButton)
-              Row(
-                children: [
-                  if (showCancelButton)
-                    Expanded(
-                      child: OutlinedButton(
-                        onPressed: onCancel ?? () => Navigator.pop(context),
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor:
-                          cancelColor ?? Colors.grey.shade700,
-                          minimumSize: Size(
-                            double.infinity,
-                            48.h,
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12.r),
-                          ),
-                        ),
-                        child: Text(
-                          cancelText ?? 'Cancel',
-                          style: TextStyle(
-                            fontSize: 14.sp,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                    ),
-                  if (showCancelButton && showConfirmButton)
-                    SizedBox(width: 12.w),
-                  if (showConfirmButton)
-                    Expanded(
-                      child: ElevatedButton(
-                        onPressed:
-                        onConfirm ?? () => Navigator.pop(context),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor:
-                          confirmColor ?? Colors.blue,
-                          foregroundColor: Colors.white,
-                          minimumSize: Size(
-                            double.infinity,
-                            48.h,
-                          ),
-                          elevation: 0,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12.r),
-                          ),
-                        ),
-                        child: Text(
-                          confirmText ?? 'OK',
-                          style: TextStyle(
-                            fontSize: 14.sp,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                    ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (topImage != null) ...[
+                  topImage,
+                  const Gap(18),
                 ],
-              ),
-          ],
+                if (title != null) ...[
+                  Text(
+                    title!,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 22.sp,
+                      fontWeight: FontWeight.w700,
+                      height: 1.15,
+                      letterSpacing: -0.5,
+                      color: titleColor,
+                    ),
+                  ),
+                  const Gap(10),
+                ],
+                if (message != null) ...[
+                  Text(
+                    message!,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 16.sp,
+                      fontWeight: FontWeight.w400,
+                      height: 1.4,
+                      letterSpacing: -0.1,
+                      color: messageColor,
+                    ),
+                  ),
+                  const Gap(24),
+                ],
+                if (content != null) ...[
+                  content!,
+                  const Gap(24),
+                ],
+                if (showConfirmButton || showCancelButton)
+                  Row(
+                    children: [
+                      if (showCancelButton)
+                        _buildCancelButton(context),
+                      if (showCancelButton &&
+                          showConfirmButton)
+                        const Gap(10),
+                      if (showConfirmButton)
+                        _buildConfirmButton(context),
+                    ],
+                  ),
+              ],
+            ),
+          ),
         ),
       ),
     );
@@ -198,8 +570,8 @@ class CustomDialog extends StatelessWidget {
     Color? backgroundColor,
     VoidCallback? onConfirm,
     VoidCallback? onCancel,
-    bool showConfirmButton = true,
-    bool showCancelButton = false,
+    bool? showConfirmButton,
+    bool? showCancelButton,
     bool barrierDismissible = true,
     double? imageSize,
     double? borderRadius,
@@ -208,6 +580,7 @@ class CustomDialog extends StatelessWidget {
     return showDialog<T>(
       context: context,
       barrierDismissible: barrierDismissible,
+      barrierColor: Colors.black.withValues(alpha: 0.6), // Darker backdrop for dark mode dialog
       builder: (context) {
         return CustomDialog(
           image: image,
@@ -215,20 +588,27 @@ class CustomDialog extends StatelessWidget {
           title: title,
           message: message,
           content: content,
-          confirmText: confirmText,
-          cancelText: cancelText,
-          confirmColor: confirmColor,
-          cancelColor: cancelColor,
-          titleColor: titleColor,
-          messageColor: messageColor,
-          backgroundColor: backgroundColor,
+          confirmText: confirmText ?? 'Yes',
+          cancelText: cancelText ?? 'No',
+          confirmColor:
+          confirmColor ?? const Color(0xFF4285F4),
+          cancelColor:
+          cancelColor ?? Colors.white,
+          titleColor:
+          titleColor ?? Colors.white,
+          messageColor:
+          messageColor ?? Colors.white70,
+          backgroundColor:
+          backgroundColor ?? const Color(0xFF2A2B3D),
           onConfirm: onConfirm,
           onCancel: onCancel,
-          showConfirmButton: showConfirmButton,
-          showCancelButton: showCancelButton,
+          showConfirmButton:
+          showConfirmButton ?? true,
+          showCancelButton:
+          showCancelButton ?? true,
           barrierDismissible: barrierDismissible,
           imageSize: imageSize,
-          borderRadius: borderRadius,
+          borderRadius: borderRadius ?? 24.r,
           padding: padding,
         );
       },
