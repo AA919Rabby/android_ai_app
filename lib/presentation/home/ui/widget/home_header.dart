@@ -2,17 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gap/flutter_gap.dart';
 import 'package:flutter_screenutil_plus/flutter_screenutil_plus.dart';
 import 'package:ai_chatapp/core/global/custom_text.dart';
+import 'package:get/get.dart';
+
+import '../../controller/auth_controller.dart';
 
 class HomeHeader extends StatelessWidget {
   final VoidCallback onMenuTap;
 
-  const HomeHeader({
-    super.key,
-    required this.onMenuTap,
-  });
+  const HomeHeader({super.key, required this.onMenuTap});
 
   @override
   Widget build(BuildContext context) {
+    final authController = Get.find<AuthController>();
+
     return Row(
       children: [
         Material(
@@ -22,11 +24,7 @@ class HomeHeader extends StatelessWidget {
             borderRadius: BorderRadius.circular(12.r),
             child: Padding(
               padding: EdgeInsets.all(8.r),
-              child: Icon(
-                Icons.menu_rounded,
-                size: 25.r,
-                color: Colors.white, // White icon
-              ),
+              child: Icon(Icons.menu_rounded, size: 25.r, color: Colors.white),
             ),
           ),
         ),
@@ -39,24 +37,33 @@ class HomeHeader extends StatelessWidget {
             gradient: const LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: [
-                Color(0xFF4285F4),
-                Color(0xFF9B72CB),
-              ],
+              colors: [Color(0xFF4285F4), Color(0xFF9B72CB)],
             ),
           ),
-          child: Icon(
-            Icons.auto_awesome_rounded,
-            size: 18.r,
-            color: Colors.white,
-          ),
+          child: Icon(Icons.auto_awesome_rounded, size: 18.r, color: Colors.white),
         ),
         const Gap(8),
-        CustomText(
-          text: 'Gemini X',
-          fontSize: 18.sp,
-          fontWeight: FontWeight.w600,
-          color: Colors.white, // White text
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            CustomText(
+              text: 'Gemini X',
+              fontSize: 18.sp,
+              fontWeight: FontWeight.w600,
+              color: Colors.white,
+            ),
+            Obx(() {
+              final user = authController.currentUser.value;
+              return user != null
+                  ? CustomText(
+                text: user.email ?? 'Unknown User',
+                fontSize: 11.sp,
+                color: Colors.white54,
+              )
+                  : const SizedBox.shrink();
+            }),
+          ],
         ),
         const Spacer(),
       ],

@@ -44,7 +44,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil_plus/flutter_screenutil_plus.dart';
 import 'package:get/get.dart';
-
 import 'all_binding.dart';
 import 'core/theme/app_colors.dart';
 
@@ -65,39 +64,28 @@ class MyApp extends StatelessWidget {
       builder: (context, child) {
         return GetMaterialApp(
           debugShowCheckedModeBanner: false,
-   //
+          title: 'AI ChatApp',
           theme: ThemeData(
             useMaterial3: true,
-
             brightness: Brightness.dark,
-
-            scaffoldBackgroundColor:
-            AppColors.background,
-
+            scaffoldBackgroundColor: const Color(0xFF1E1E2E),
             colorScheme: const ColorScheme.dark(
-              primary: AppColors.primary,
-              secondary: AppColors.secondary,
-              surface: AppColors.surface,
-              onSurface: AppColors.text,
+              primary: Color(0xFF4285F4),
+              secondary: Color(0xFF9B72CB),
+              surface: Color(0xFF2A2B3D),
+              onSurface: Colors.white,
               onPrimary: Colors.white,
             ),
-
             appBarTheme: const AppBarTheme(
-              backgroundColor: AppColors.background,
-              foregroundColor: AppColors.text,
+              backgroundColor: Color(0xFF1E1E2E),
+              foregroundColor: Colors.white,
               elevation: 0,
             ),
-
             dialogTheme: const DialogThemeData(
-              backgroundColor: AppColors.surface,
+              backgroundColor: Color(0xFF2A2B3D),
             ),
           ),
-
-          // Do NOT use darkTheme.
-          // Do NOT use ThemeMode.system.
-
           initialBinding: AllBinding(),
-
           home: home,
         );
       },
