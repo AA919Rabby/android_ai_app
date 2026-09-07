@@ -134,7 +134,7 @@ class CustomDrawer extends GetView<HomeController> {
                     );
                   }),
                 ),
-                Divider(height: 1, color: const Color(0xFF45475A)),
+              const Divider(height: 1, color: Color(0xFF45475A)),
                 Padding(
                   padding: EdgeInsets.all(12.r),
                   child: Column(
@@ -158,6 +158,14 @@ class CustomDrawer extends GetView<HomeController> {
   void _handleLogout(BuildContext context) async {
     Navigator.of(context).pop(); // Close Drawer
     CustomDialog.show(
+        imageWidget: Container(
+          width: 55.r, height: 55.r,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(10.r),
+            gradient: const LinearGradient(colors: [Color(0xFF4285F4), Color(0xFF9B72CB)]),
+          ),
+          child: Icon(Icons.auto_awesome_rounded, color: Colors.white, size: 21.r),
+        ),
         context: context,
         title: "Logout",
         message: 'Do you want to Logout?',

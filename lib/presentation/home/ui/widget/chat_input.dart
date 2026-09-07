@@ -2,58 +2,60 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gap/flutter_gap.dart';
 import 'package:flutter_screenutil_plus/flutter_screenutil_plus.dart';
 import 'package:get/get.dart';
-import 'package:ai_chatapp/presentation/home/controller/home_controller.dart';
+import '../../controller/home_controller.dart';
+
 
 class ChatInput extends GetView<HomeController> {
   const ChatInput({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return Obx(() => Container(
       width: double.infinity,
       padding: EdgeInsets.fromLTRB(14.w, 12.h, 10.w, 10.h),
       decoration: BoxDecoration(
         color: const Color(0xFF2A2B3D),
         borderRadius: BorderRadius.circular(26.r),
-        border: Border.all(color: const Color(0xFF4285F4)),
+        // Fades border color unless user clicks on it
+        border: Border.all(
+          color: controller.isInputFocused.value
+              ? const Color(0xFF4285F4)
+              : const Color(0xFF45475A).withOpacity(0.5),
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Image Preview
-          Obx(() {
-            if (controller.selectedImage.value != null) {
-              return Stack(
-                children: [
-                  Container(
-                    margin: EdgeInsets.only(bottom: 10.h, left: 4.w),
-                    height: 80.h,
-                    width: 80.h,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12.r),
-                      image: DecorationImage(
-                        image: FileImage(controller.selectedImage.value!),
-                        fit: BoxFit.cover,
-                      ),
+          if (controller.selectedImage.value != null)
+            Stack(
+              children: [
+                Container(
+                  margin: EdgeInsets.only(bottom: 10.h, left: 4.w),
+                  height: 80.h,
+                  width: 80.h,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12.r),
+                    image: DecorationImage(
+                      image: FileImage(controller.selectedImage.value!),
+                      fit: BoxFit.cover,
                     ),
                   ),
-                  Positioned(
-                    top: -5,
-                    right: -5,
-                    child: IconButton(
-                      icon: Container(
-                        padding: EdgeInsets.all(2.r),
-                        decoration: const BoxDecoration(color: Colors.black54, shape: BoxShape.circle),
-                        child: const Icon(Icons.close, color: Colors.white, size: 16),
-                      ),
-                      onPressed: controller.removeSelectedImage,
+                ),
+                Positioned(
+                  top: -5,
+                  right: -5,
+                  child: IconButton(
+                    icon: Container(
+                      padding: EdgeInsets.all(2.r),
+                      decoration: const BoxDecoration(color: Colors.black54, shape: BoxShape.circle),
+                      child: const Icon(Icons.close, color: Colors.white, size: 16),
                     ),
+                    onPressed: controller.removeSelectedImage,
                   ),
-                ],
-              );
-            }
-            return const SizedBox.shrink();
-          }),
+                ),
+              ],
+            ),
 
           TextField(
             controller: controller.messageController,
@@ -75,23 +77,26 @@ class ChatInput extends GetView<HomeController> {
             children: [
               _ActionButton(icon: Icons.add_photo_alternate_rounded, onTap: controller.attachFile),
               const Spacer(),
-              Obx(() => _ActionButton(
+              _ActionButton(
                 icon: controller.isListening.value ? Icons.mic : Icons.mic_none_rounded,
                 color: controller.isListening.value ? Colors.redAccent : null,
                 onTap: controller.startVoiceInput,
-              )),
+              ),
               const Gap(8),
 
-              // FIXED Obx usage here
-              Obx(() => _SendButton(
-                enabled: controller.hasMessage.value || controller.selectedImage.value != null,
-                onTap: controller.sendMessage,
-              )),
+              // Changes to a STOP button when AI is thinking
+              if (controller.isAiThinking.value)
+                _StopButton(onTap: controller.stopAiGeneration)
+              else
+                _SendButton(
+                  enabled: controller.hasMessage.value || controller.selectedImage.value != null,
+                  onTap: controller.sendMessage,
+                ),
             ],
           ),
         ],
       ),
-    );
+    ));
   }
 }
 
@@ -140,6 +145,33 @@ class _SendButton extends StatelessWidget {
           onTap: enabled ? onTap : null,
           borderRadius: BorderRadius.circular(22.r),
           child: Icon(Icons.arrow_upward_rounded, size: 21.r, color: enabled ? Colors.white : Colors.white54),
+        ),
+      ),
+    );
+  }
+}
+
+class _StopButton extends StatelessWidget {
+  final VoidCallback onTap;
+
+  const _StopButton({required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 200),
+      width: 38.r, height: 38.r,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: Colors.transparent,
+        border: Border.all(color: Colors.redAccent),
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(22.r),
+          child: Icon(Icons.stop_rounded, size: 24.r, color: Colors.redAccent),
         ),
       ),
     );
