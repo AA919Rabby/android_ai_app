@@ -3,7 +3,7 @@ name: Build Flutter APK
 on:
   push:
     branches: [ Rabbi ]
-  workflow_dispatch:   # lets you trigger it manually from GitHub too
+  workflow_dispatch:
 
 jobs:
   build:
@@ -22,6 +22,7 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
+          flutter-version: '3.44.1'
           channel: 'stable'
 
       - name: Install dependencies
