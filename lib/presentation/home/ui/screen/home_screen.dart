@@ -112,7 +112,7 @@ class HomeScreen extends GetView<HomeController> {
                               ),
                             ),
                             icon: authController.isLoading.value
-                                ? SizedBox(height: 20.r, width: 20.r, child: const CircularProgressIndicator(color: Colors.black, strokeWidth: 2))
+                                ? SizedBox(height: 20.r, width: 20.r, child: const CustomLoader())
                                 : Icon(Icons.g_mobiledata_rounded, size: 30.r, color: Colors.blue),
                             label: CustomText(text: 'Sign in with Google', fontSize: 16.sp, fontWeight: FontWeight.bold, color: Colors.black),
                             onPressed: authController.isLoading.value ? null : () => authController.signInWithGoogle(),
@@ -147,7 +147,7 @@ class HomeScreen extends GetView<HomeController> {
             SizedBox(
               height: 14.r,
               width: 14.r,
-              child: CustomLoader(),
+              child: const CustomLoader(),
             ),
             const Gap(10),
             CustomText(text: 'AI is thinking...', color: Colors.white70, fontSize: 14.sp),

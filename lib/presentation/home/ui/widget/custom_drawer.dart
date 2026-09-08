@@ -8,7 +8,6 @@ import 'package:get/get.dart';
 
 import '../../controller/auth_controller.dart';
 
-// (AnimatedDrawerBackground Class stays exactly as you provided earlier)
 class AnimatedDrawerBackground extends StatefulWidget {
   const AnimatedDrawerBackground({super.key});
   @override
@@ -26,6 +25,7 @@ class _AnimatedDrawerBackgroundState extends State<AnimatedDrawerBackground> wit
     _controller.dispose();
     super.dispose();
   }
+
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
@@ -64,16 +64,31 @@ class CustomDrawer extends GetView<HomeController> {
                   padding: EdgeInsets.all(20.r),
                   child: Row(
                     children: [
-                      Container(
-                        width: 38.r, height: 38.r,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10.r),
-                          gradient: const LinearGradient(colors: [Color(0xFF4285F4), Color(0xFF9B72CB)]),
-                        ),
-                        child: Icon(Icons.auto_awesome_rounded, color: Colors.white, size: 21.r),
+                      Column(
+                        children: [
+                          Container(
+                            width: 38.r, height: 38.r,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10.r),
+                              gradient: const LinearGradient(colors: [Color(0xFF4285F4), Color(0xFF9B72CB)]),
+                            ),
+                            child: Icon(Icons.auto_awesome_rounded, color: Colors.white, size: 21.r),
+                          ),
+                          const Gap(10),
+                          CustomText(text: 'Gemini X', fontSize: 18.sp, fontWeight: FontWeight.w600, color: Colors.white),
+                          Obx(() {
+                            final authController = Get.find<AuthController>();
+                            final user = authController.currentUser.value;
+                            return user != null
+                                ? CustomText(
+                              text: user.email ?? 'Unknown User',
+                              fontSize: 11.sp,
+                              color: Colors.white54,
+                            )
+                                : const SizedBox.shrink();
+                          }),
+                        ],
                       ),
-                      const Gap(10),
-                      CustomText(text: 'Gemini X', fontSize: 18.sp, fontWeight: FontWeight.w600, color: Colors.white),
                       const Spacer(),
                       IconButton(onPressed: () => Get.back(), icon: const Icon(Icons.clear, color: Colors.white))
                     ],
@@ -134,7 +149,7 @@ class CustomDrawer extends GetView<HomeController> {
                     );
                   }),
                 ),
-              const Divider(height: 1, color: Color(0xFF45475A)),
+                const Divider(height: 1, color: Color(0xFF45475A)),
                 Padding(
                   padding: EdgeInsets.all(12.r),
                   child: Column(
@@ -159,7 +174,7 @@ class CustomDrawer extends GetView<HomeController> {
     Navigator.of(context).pop(); // Close Drawer
     CustomDialog.show(
         imageWidget: Container(
-          width: 55.r, height: 55.r,
+          width: 80.r, height: 80.r,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(10.r),
             gradient: const LinearGradient(colors: [Color(0xFF4285F4), Color(0xFF9B72CB)]),
@@ -173,8 +188,8 @@ class CustomDrawer extends GetView<HomeController> {
         confirmText: 'Yes',
         confirmColor: Colors.redAccent,
         onConfirm: () {
+          // No need to manually pop the dialog here anymore, the CustomDialog does it!
           Get.find<AuthController>().signOut();
-          Navigator.of(context).pop(); // Close Dialog
         }
     );
   }

@@ -4,7 +4,6 @@ import 'package:flutter_screenutil_plus/flutter_screenutil_plus.dart';
 import 'package:ai_chatapp/core/global/custom_text.dart';
 import 'package:get/get.dart';
 
-import '../../controller/auth_controller.dart';
 
 class HomeHeader extends StatelessWidget {
   final VoidCallback onMenuTap;
@@ -13,7 +12,7 @@ class HomeHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final authController = Get.find<AuthController>();
+
 
     return Row(
       children: [
@@ -53,16 +52,6 @@ class HomeHeader extends StatelessWidget {
               fontWeight: FontWeight.w600,
               color: Colors.white,
             ),
-            Obx(() {
-              final user = authController.currentUser.value;
-              return user != null
-                  ? CustomText(
-                text: user.email ?? 'Unknown User',
-                fontSize: 11.sp,
-                color: Colors.white54,
-              )
-                  : const SizedBox.shrink();
-            }),
           ],
         ),
         const Spacer(),
