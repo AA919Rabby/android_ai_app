@@ -168,7 +168,7 @@ class HomeController extends GetxController {
                     child: CustomLoader(),
                   )
                       : CustomText(
-                    text: r'Buy Now — $10 / month',
+                    text: r'Buy Now — $10 / monthly',
                     fontSize: 15.sp,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,

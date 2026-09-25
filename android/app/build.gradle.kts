@@ -2,7 +2,6 @@ plugins {
     id("com.android.application")
     id("kotlin-android")
     id("dev.flutter.flutter-gradle-plugin")
-    // Firebase plugin
     id("com.google.gms.google-services")
 }
 
@@ -16,13 +15,9 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 
-    // We removed kotlinOptions and sourceSets completely as Flutter now
-    // handles these automatically in the background without errors!
-
     defaultConfig {
         applicationId = "com.example.ai_chatapp"
 
-        // Required for Mic and Firebase
         minSdk = flutter.minSdkVersion
 
         targetSdk = flutter.targetSdkVersion
@@ -32,7 +27,9 @@ android {
 
     signingConfigs {
         create("release") {
-            storeFile = file(System.getenv("KEYSTORE_PATH") ?: "release-key.jks")
+            storeFile = file(
+                System.getenv("KEYSTORE_PATH") ?: "release-key.jks"
+            )
             storePassword = System.getenv("KEYSTORE_PASSWORD") ?: ""
             keyAlias = System.getenv("KEY_ALIAS") ?: ""
             keyPassword = System.getenv("KEY_PASSWORD") ?: ""
@@ -41,10 +38,8 @@ android {
 
     buildTypes {
         release {
-            // Keep your existing signingConfig line if you have one!
-            // signingConfig = signingConfigs.getByName("release")
+            signingConfig = signingConfigs.getByName("release")
 
-            // ADD THESE TWO LINES TO DISABLE R8:
             isMinifyEnabled = false
             isShrinkResources = false
         }
