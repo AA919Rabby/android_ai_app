@@ -41,13 +41,12 @@ android {
 
     buildTypes {
         release {
-            signingConfig = signingConfigs.getByName("release") // or your signing config
-            isMinifyEnabled = true
-            isShrinkResources = true
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
+            // Keep your existing signingConfig line if you have one!
+            // signingConfig = signingConfigs.getByName("release")
+
+            // ADD THESE TWO LINES TO DISABLE R8:
+            isMinifyEnabled = false
+            isShrinkResources = false
         }
     }
 }
