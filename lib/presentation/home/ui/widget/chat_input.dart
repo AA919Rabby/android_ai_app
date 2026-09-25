@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gap/flutter_gap.dart';
 import 'package:flutter_screenutil_plus/flutter_screenutil_plus.dart';
 import 'package:get/get.dart';
+import '../../../../core/global/custom_text.dart';
 import '../../controller/home_controller.dart';
-
 
 class ChatInput extends GetView<HomeController> {
   const ChatInput({super.key});
@@ -12,11 +12,10 @@ class ChatInput extends GetView<HomeController> {
   Widget build(BuildContext context) {
     return Obx(() => Container(
       width: double.infinity,
-      padding: EdgeInsets.fromLTRB(14.w, 12.h, 10.w, 10.h),
+      padding: EdgeInsets.fromLTRB(14.w, 10.h, 10.w, 10.h),
       decoration: BoxDecoration(
         color: const Color(0xFF2A2B3D),
         borderRadius: BorderRadius.circular(26.r),
-        // Fades border color unless user clicks on it
         border: Border.all(
           color: controller.isInputFocused.value
               ? const Color(0xFF4285F4)
@@ -26,6 +25,28 @@ class ChatInput extends GetView<HomeController> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // PLAN SELECTOR IN CHAT BAR (General vs Pro)
+          Row(
+            children: [
+              _PlanToggleBadge(
+                title: 'General',
+                isSelected: controller.selectedPlan.value == 'General',
+                icon: Icons.chat_bubble_outline_rounded,
+                onTap: () => controller.onSelectPlan('General'),
+              ),
+              const Gap(8),
+              _PlanToggleBadge(
+                title: 'Pro',
+                isProBadge: true,
+                isSelected: controller.selectedPlan.value == 'Pro',
+                isUnlocked: controller.isProPurchased.value,
+                icon: Icons.bolt_rounded,
+                onTap: () => controller.onSelectPlan('Pro'),
+              ),
+            ],
+          ),
+          const Gap(6),
+
           // Image Preview
           if (controller.selectedImage.value != null)
             Stack(
@@ -65,7 +86,7 @@ class ChatInput extends GetView<HomeController> {
             textInputAction: TextInputAction.newline,
             style: TextStyle(fontSize: 15.sp, fontFamily: 'Poppins', color: Colors.white),
             decoration: InputDecoration(
-              hintText: 'Ask anything...',
+              hintText: controller.selectedPlan.value == 'Pro' ? 'Ask Pro anything (more tokens)...' : 'Ask anything...',
               hintStyle: TextStyle(fontSize: 15.sp, color: Colors.white54, fontFamily: 'Poppins'),
               border: InputBorder.none,
               isDense: true,
@@ -84,7 +105,6 @@ class ChatInput extends GetView<HomeController> {
               ),
               const Gap(8),
 
-              // Changes to a STOP button when AI is thinking
               if (controller.isAiThinking.value)
                 _StopButton(onTap: controller.stopAiGeneration)
               else
@@ -97,6 +117,70 @@ class ChatInput extends GetView<HomeController> {
         ],
       ),
     ));
+  }
+}
+
+class _PlanToggleBadge extends StatelessWidget {
+  final String title;
+  final bool isSelected;
+  final bool isProBadge;
+  final bool isUnlocked;
+  final IconData icon;
+  final VoidCallback onTap;
+
+  const _PlanToggleBadge({
+    required this.title,
+    required this.isSelected,
+    this.isProBadge = false,
+    this.isUnlocked = false,
+    required this.icon,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(16.r),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? (isProBadge ? const Color(0xFF6C7BF5) : const Color(0xFF4285F4))
+              : const Color(0xFF1E1E2E),
+          borderRadius: BorderRadius.circular(16.r),
+          border: Border.all(
+            color: isSelected
+                ? Colors.transparent
+                : (isProBadge && !isUnlocked ? const Color(0xFF9475D8).withOpacity(0.5) : const Color(0xFF45475A)),
+          ),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              icon,
+              size: 14.r,
+              color: isSelected
+                  ? Colors.white
+                  : (isProBadge ? const Color(0xFF9475D8) : Colors.white70),
+            ),
+            const Gap(5),
+            CustomText(
+              text: title,
+              fontSize: 12.sp,
+              fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+              color: isSelected ? Colors.white : Colors.white70,
+            ),
+            if (isProBadge && !isUnlocked) ...[
+              const Gap(4),
+              Icon(Icons.lock_outline_rounded, size: 12.r, color: const Color(0xFF9475D8)),
+            ]
+          ],
+        ),
+      ),
+    );
   }
 }
 

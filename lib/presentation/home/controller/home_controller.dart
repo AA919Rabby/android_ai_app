@@ -2,11 +2,16 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_screenutil_plus/flutter_screenutil_plus.dart';
+import 'package:flutter_stripe/flutter_stripe.dart';
+import 'package:flutter_gap/flutter_gap.dart';
 import 'package:get/get.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
+import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 import 'package:uuid/uuid.dart';
+import '../../../../core/global/custom_text.dart';
 import '../data/model/chat_model.dart';
 import '../data/repositories/chat_repository.dart';
 import 'auth_controller.dart';
@@ -21,17 +26,22 @@ class HomeController extends GetxController {
   final FocusNode messageFocusNode = FocusNode();
 
   GenerativeModel? _geminiModel;
-  bool _cancelAiGeneration = false; // Flag to stop AI
+  bool _cancelAiGeneration = false;
+
+  // Plan Selection State
+  RxString selectedPlan = 'General'.obs; // 'General' or 'Pro'
+  RxBool isProPurchased = false.obs;
+  RxBool isProcessingPayment = false.obs;
 
   // Model Selection Data
-  final List<String> models = ['gemini-2.5-flash', 'gemini-2.5-flash'];
+  final List<String> models = ['gemini-2.5-flash', 'gemini-2.5-pro'];
   RxString selectedModel = 'gemini-2.5-flash'.obs;
 
   // State
   RxBool hasMessage = false.obs;
   RxBool isAiThinking = false.obs;
   RxBool isListening = false.obs;
-  RxBool isInputFocused = false.obs; // Tracks if text field is clicked
+  RxBool isInputFocused = false.obs;
 
   RxString currentSessionId = ''.obs;
   RxList<ChatMessage> currentMessages = <ChatMessage>[].obs;
@@ -48,13 +58,14 @@ class HomeController extends GetxController {
     _initGemini();
     _initSpeech();
 
-    // React to Auth Changes
     ever(authController.currentUser, (user) {
       if (user != null) {
         _listenToRecentSessions(user.uid);
       } else {
         createNewChat();
         recentSessions.clear();
+        isProPurchased.value = false;
+        selectedPlan.value = 'General';
       }
     });
 
@@ -62,10 +73,211 @@ class HomeController extends GetxController {
       hasMessage.value = messageController.text.trim().isNotEmpty;
     });
 
-    // Listen to focus changes for the border color
     messageFocusNode.addListener(() {
       isInputFocused.value = messageFocusNode.hasFocus;
     });
+  }
+
+  void onSelectPlan(String plan) {
+    if (plan == 'General') {
+      selectedPlan.value = 'General';
+      selectedModel.value = 'gemini-1.5-flash';
+      _initGemini();
+    } else if (plan == 'Pro') {
+      if (isProPurchased.value) {
+        selectedPlan.value = 'Pro';
+        selectedModel.value = 'gemini-1.5-pro';
+        _initGemini();
+      } else {
+        _showProSubscriptionDialog();
+      }
+    }
+  }
+
+  void _showProSubscriptionDialog() {
+    Get.dialog(
+      Dialog(
+        backgroundColor: const Color(0xFF2A2B3D),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.r)),
+        child: Padding(
+          padding: EdgeInsets.all(20.r),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    padding: EdgeInsets.all(8.r),
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFF6C7BF5), Color(0xFF9475D8)],
+                      ),
+                      borderRadius: BorderRadius.circular(12.r),
+                    ),
+                    child: const Icon(Icons.bolt_rounded, color: Colors.white, size: 24),
+                  ),
+                  const Gap(12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        CustomText(
+                          text: 'Upgrade to Pro',
+                          fontSize: 18.sp,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                        CustomText(
+                          text: r'$10.00 / Month',
+                          fontSize: 14.sp,
+                          color: const Color(0xFF6C7BF5),
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ],
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.close, color: Colors.white54),
+                    onPressed: () => Get.back(),
+                  ),
+                ],
+              ),
+              const Gap(16),
+              const Divider(color: Color(0xFF45475A)),
+              const Gap(12),
+              _buildFeatureItem(Icons.psychology_rounded, 'More powerful reasoning & logic'),
+              _buildFeatureItem(Icons.token_rounded, 'Extended token context limit'),
+              _buildFeatureItem(Icons.flash_on_rounded, 'Priority queue & ultra-fast speeds'),
+              _buildFeatureItem(Icons.image_rounded, 'High resolution multi-modal support'),
+              const Gap(20),
+              Obx(() => SizedBox(
+                width: double.infinity,
+                height: 48.h,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF4285F4),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
+                  ),
+                  onPressed: isProcessingPayment.value ? null : buyProWithStripe,
+                  child: isProcessingPayment.value
+                      ? const SizedBox(
+                    height: 20,
+                    width: 20,
+                    child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                  )
+                      : CustomText(
+                    text: r'Buy Now — $10 / month',
+                    fontSize: 15.sp,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+              )),
+            ],
+          ),
+        ),
+      ),
+      barrierDismissible: true,
+    );
+  }
+
+  Widget _buildFeatureItem(IconData icon, String title) {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 5.h),
+      child: Row(
+        children: [
+          Icon(icon, color: const Color(0xFF9475D8), size: 18.r),
+          const Gap(10),
+          Expanded(
+            child: CustomText(text: title, fontSize: 13.sp, color: Colors.white70),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> buyProWithStripe() async {
+    final stripeSecret = dotenv.env['STRIPE_SECRET_KEY'];
+    if (stripeSecret == null || stripeSecret.isEmpty) {
+      Get.snackbar(
+        'Configuration Error',
+        'Stripe secret key not found in .env',
+        backgroundColor: Colors.redAccent,
+        colorText: Colors.white,
+      );
+      return;
+    }
+
+    try {
+      isProcessingPayment.value = true;
+
+      // 1. Create PaymentIntent on Stripe (10 USD = 1000 cents)
+      final response = await http.post(
+        Uri.parse('https://api.stripe.com/v1/payment_intents'),
+        headers: {
+          'Authorization': 'Bearer $stripeSecret',
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: {
+          'amount': '1000',
+          'currency': 'usd',
+          'payment_method_types[]': 'card',
+          'description': 'Gemini X Pro Subscription',
+        },
+      );
+
+      final paymentIntentData = jsonDecode(response.body);
+      if (paymentIntentData['client_secret'] == null) {
+        throw Exception(paymentIntentData['error']?['message'] ?? 'Failed to init payment');
+      }
+
+      // 2. Initialize Stripe Sheet
+      await Stripe.instance.initPaymentSheet(
+        paymentSheetParameters: SetupPaymentSheetParameters(
+          paymentIntentClientSecret: paymentIntentData['client_secret'],
+          merchantDisplayName: 'Gemini X',
+          style: ThemeMode.dark,
+        ),
+      );
+
+      // 3. Present Sheet
+      await Stripe.instance.presentPaymentSheet();
+
+      // 4. Success handling
+      isProPurchased.value = true;
+      selectedPlan.value = 'Pro';
+      selectedModel.value = 'gemini-1.5-pro';
+      _initGemini();
+
+      Get.back(); // close upgrade modal
+
+      Get.snackbar(
+        'Success',
+        'Welcome to Pro! Plan unlocked.',
+        backgroundColor: Colors.green,
+        colorText: Colors.white,
+        snackPosition: SnackPosition.TOP,
+      );
+    } on StripeException catch (e) {
+      if (e.error.code != FailureCode.Canceled) {
+        Get.snackbar(
+          'Payment Error',
+          e.error.localizedMessage ?? 'Payment failed',
+          backgroundColor: Colors.redAccent,
+          colorText: Colors.white,
+        );
+      }
+    } catch (e) {
+      Get.snackbar(
+        'Payment Failed',
+        e.toString(),
+        backgroundColor: Colors.redAccent,
+        colorText: Colors.white,
+      );
+    } finally {
+      isProcessingPayment.value = false;
+    }
   }
 
   void selectModel(String model) {
@@ -76,7 +288,7 @@ class HomeController extends GetxController {
   void _initGemini() {
     final apiKey = dotenv.env['GEMINI_API_KEY'];
     if (apiKey != null && apiKey.isNotEmpty) {
-      String aiModel = selectedModel.value == 'gemini-2.5-flash' ? 'gemini-2.5-flash' : 'gemini-2.5-flash';
+      String aiModel = selectedPlan.value == 'Pro' ? 'gemini-1.5-pro' : 'gemini-1.5-flash';
       _geminiModel = GenerativeModel(model: aiModel, apiKey: apiKey);
     }
   }
@@ -87,7 +299,7 @@ class HomeController extends GetxController {
 
   void createNewChat() {
     currentSessionId.value = '';
-    currentMessages.clear(); // Clears messages to show "Welcome" screen
+    currentMessages.clear();
     selectedImage.value = null;
     messageController.clear();
     isAiThinking.value = false;
@@ -133,7 +345,6 @@ class HomeController extends GetxController {
     }
   }
 
-  // Feature: Stop AI generation
   void stopAiGeneration() {
     _cancelAiGeneration = true;
     isAiThinking.value = false;
@@ -152,17 +363,15 @@ class HomeController extends GetxController {
 
     if ((text.isEmpty && imageFile == null) || user == null) return;
 
-    // Create session if it doesn't exist
     if (currentSessionId.value.isEmpty) {
       currentSessionId.value = const Uuid().v4();
-      // Only start listening to Firebase after creating ID
       loadSession(currentSessionId.value);
     }
 
     messageController.clear();
     FocusScope.of(Get.context!).unfocus();
     isAiThinking.value = true;
-    _cancelAiGeneration = false; // Reset cancel flag
+    _cancelAiGeneration = false;
 
     String? base64String;
     List<Part> promptParts = [];
@@ -175,9 +384,8 @@ class HomeController extends GetxController {
       promptParts.add(DataPart('image/jpeg', bytes));
     }
 
-    selectedImage.value = null; // clear image after encoding
+    selectedImage.value = null;
 
-    // 1. Optimistically add user message to UI immediately
     final userMsg = ChatMessage(
       id: const Uuid().v4(),
       text: text,
@@ -188,22 +396,18 @@ class HomeController extends GetxController {
     currentMessages.add(userMsg);
 
     try {
-      // Save user message to Firebase
       await chatRepository.saveMessage(user.uid, currentSessionId.value, userMsg, text.isNotEmpty ? text : 'Image Chat');
 
-      // Check if API key is missing
       if (_geminiModel == null) {
         throw Exception('MISSING_API_KEY');
       }
 
-      // Generate AI Content
       final response = await _geminiModel!.generateContent([Content.multi(promptParts)]);
 
-      if (_cancelAiGeneration) return; // Ignore response if user clicked stop
+      if (_cancelAiGeneration) return;
 
       final aiText = response.text ?? 'I could not process that.';
 
-      // Save AI message to Firebase
       final aiMsg = ChatMessage(
         id: const Uuid().v4(),
         text: aiText,
@@ -211,14 +415,12 @@ class HomeController extends GetxController {
         timestamp: DateTime.now(),
       );
       await chatRepository.saveMessage(user.uid, currentSessionId.value, aiMsg, text.isNotEmpty ? text : 'Image Chat');
-
     } catch (e) {
       if (_cancelAiGeneration) return;
 
       String errorText = 'An error occurred. Please try again.';
       final errorString = e.toString().toLowerCase();
 
-      // Handle Quota/Limits or Missing Key
       if (errorString.contains('429') || errorString.contains('quota') || errorString.contains('limit')) {
         errorText = "⚠️ You have reached your API limit/quota. Please try again later or upgrade your plan.";
       } else if (errorString.contains('missing_api_key')) {
@@ -231,8 +433,7 @@ class HomeController extends GetxController {
         isUser: false,
         timestamp: DateTime.now(),
       );
-      currentMessages.add(errorMsg); // Show error in chat
-
+      currentMessages.add(errorMsg);
     } finally {
       isAiThinking.value = false;
     }
