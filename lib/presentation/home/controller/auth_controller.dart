@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 
@@ -20,8 +22,10 @@ class AuthController extends GetxController {
     try {
       isLoading.value = true;
       await authRepository.signInWithGoogle();
+
     } catch (e) {
       Get.snackbar('Login Failed', e.toString());
+      log("$e");
     } finally {
       isLoading.value = false;
     }
