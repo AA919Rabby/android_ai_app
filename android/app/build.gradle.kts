@@ -15,11 +15,13 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 
+    kotlinOptions {
+        jvmTarget = "17"
+    }
+
     defaultConfig {
         applicationId = "com.example.ai_chatapp"
-
         minSdk = flutter.minSdkVersion
-
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
@@ -27,19 +29,22 @@ android {
 
     signingConfigs {
         create("release") {
-            storeFile = file(
-                System.getenv("KEYSTORE_PATH") ?: "release-key.jks"
-            )
-            storePassword = System.getenv("KEYSTORE_PASSWORD") ?: ""
-            keyAlias = System.getenv("KEY_ALIAS") ?: ""
-            keyPassword = System.getenv("KEY_PASSWORD") ?: ""
+            val ksPath = System.getenv("KEYSTORE_PATH")
+            if (!ksPath.isNullOrEmpty() && file(ksPath).exists()) {
+                storeFile = file(ksPath)
+                storePassword = System.getenv("KEYSTORE_PASSWORD") ?: ""
+                keyAlias = System.getenv("KEY_ALIAS") ?: ""
+                keyPassword = System.getenv("KEY_PASSWORD") ?: ""
+            } else {
+                // Fallback to debug signature if release key isn't present
+                initWith(getByName("debug"))
+            }
         }
     }
 
     buildTypes {
         release {
             signingConfig = signingConfigs.getByName("release")
-
             isMinifyEnabled = false
             isShrinkResources = false
         }
