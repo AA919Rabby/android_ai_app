@@ -34,8 +34,8 @@ class HomeController extends GetxController {
   RxBool isProPurchased = false.obs;
   RxBool isProcessingPayment = false.obs;
 
-  // Model Selection Data
-  final List<String> models = ['gemini-2.5-flash', 'gemini-2.5-pro'];
+  // Model Selection Data - Strictly set to gemini-2.5-flash
+  final List<String> models = ['gemini-2.5-flash'];
   RxString selectedModel = 'gemini-2.5-flash'.obs;
 
   // State
@@ -82,12 +82,12 @@ class HomeController extends GetxController {
   void onSelectPlan(String plan) {
     if (plan == 'General') {
       selectedPlan.value = 'General';
-      selectedModel.value = 'gemini-1.5-flash';
+      selectedModel.value = 'gemini-2.5-flash';
       _initGemini();
     } else if (plan == 'Pro') {
       if (isProPurchased.value) {
         selectedPlan.value = 'Pro';
-        selectedModel.value = 'gemini-1.5-pro';
+        selectedModel.value = 'gemini-2.5-flash';
         _initGemini();
       } else {
         _showProSubscriptionDialog();
@@ -98,7 +98,7 @@ class HomeController extends GetxController {
   void _showProSubscriptionDialog() {
     Get.dialog(
       Dialog(
-        backgroundColor: const Color(0xFF2A2B3D),
+        backgroundColor: const Color(0xFF202638),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.r)),
         child: Padding(
           padding: EdgeInsets.all(20.r),
@@ -145,7 +145,7 @@ class HomeController extends GetxController {
                 ],
               ),
               const Gap(16),
-              const Divider(color: Color(0xFF45475A)),
+              const Divider(color: Color(0xFF353E55)),
               const Gap(12),
               _buildFeatureItem(Icons.psychology_rounded, 'More powerful reasoning & logic'),
               _buildFeatureItem(Icons.token_rounded, 'Extended token context limit'),
@@ -157,7 +157,7 @@ class HomeController extends GetxController {
                 height: 48.h,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF4285F4),
+                    backgroundColor: const Color(0xFF6C7BF5),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
                   ),
                   onPressed: isProcessingPayment.value ? null : buyProWithStripe,
@@ -225,7 +225,6 @@ class HomeController extends GetxController {
     try {
       isProcessingPayment.value = true;
 
-      // Ensure Publishable Key is initialized
       Stripe.publishableKey = stripePublishableKey;
       await Stripe.instance.applySettings();
 
@@ -264,7 +263,7 @@ class HomeController extends GetxController {
       // 4. Success handling
       isProPurchased.value = true;
       selectedPlan.value = 'Pro';
-      selectedModel.value = 'gemini-1.5-pro';
+      selectedModel.value = 'gemini-2.5-flash';
       _initGemini();
 
       Get.back(); // close upgrade modal
@@ -298,15 +297,14 @@ class HomeController extends GetxController {
   }
 
   void selectModel(String model) {
-    selectedModel.value = model;
+    selectedModel.value = 'gemini-2.5-flash';
     _initGemini();
   }
 
   void _initGemini() {
     final apiKey = dotenv.env['GEMINI_API_KEY'];
     if (apiKey != null && apiKey.isNotEmpty) {
-      String aiModel = selectedPlan.value == 'Pro' ? 'gemini-1.5-pro' : 'gemini-1.5-flash';
-      _geminiModel = GenerativeModel(model: aiModel, apiKey: apiKey);
+      _geminiModel = GenerativeModel(model: 'gemini-2.5-flash', apiKey: apiKey);
     }
   }
 
