@@ -31,7 +31,6 @@ class ChatInput extends GetView<HomeController> {
               _PlanToggleBadge(
                 title: 'General',
                 isSelected: controller.selectedPlan.value == 'General',
-                icon: Icons.chat_bubble_outline_rounded,
                 onTap: () => controller.onSelectPlan('General'),
               ),
               const Gap(8),
@@ -40,7 +39,6 @@ class ChatInput extends GetView<HomeController> {
                 isProBadge: true,
                 isSelected: controller.selectedPlan.value == 'Pro',
                 isUnlocked: controller.isProPurchased.value,
-                icon: Icons.bolt_rounded,
                 onTap: () => controller.onSelectPlan('Pro'),
               ),
             ],
@@ -125,7 +123,6 @@ class _PlanToggleBadge extends StatelessWidget {
   final bool isSelected;
   final bool isProBadge;
   final bool isUnlocked;
-  final IconData icon;
   final VoidCallback onTap;
 
   const _PlanToggleBadge({
@@ -133,7 +130,6 @@ class _PlanToggleBadge extends StatelessWidget {
     required this.isSelected,
     this.isProBadge = false,
     this.isUnlocked = false,
-    required this.icon,
     required this.onTap,
   });
 
@@ -159,14 +155,6 @@ class _PlanToggleBadge extends StatelessWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              icon,
-              size: 14.r,
-              color: isSelected
-                  ? Colors.white
-                  : (isProBadge ? const Color(0xFF9475D8) : Colors.white70),
-            ),
-            const Gap(5),
             CustomText(
               text: title,
               fontSize: 12.sp,

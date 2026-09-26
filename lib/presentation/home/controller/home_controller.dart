@@ -199,7 +199,19 @@ class HomeController extends GetxController {
   }
 
   Future<void> buyProWithStripe() async {
+    final stripePublishableKey = dotenv.env['STRIPE_PUBLISHABLE_KEY'];
     final stripeSecret = dotenv.env['STRIPE_SECRET_KEY'];
+
+    if (stripePublishableKey == null || stripePublishableKey.isEmpty) {
+      Get.snackbar(
+        'Configuration Error',
+        'Stripe publishable key not found in .env',
+        backgroundColor: Colors.redAccent,
+        colorText: Colors.white,
+      );
+      return;
+    }
+
     if (stripeSecret == null || stripeSecret.isEmpty) {
       Get.snackbar(
         'Configuration Error',
@@ -212,6 +224,10 @@ class HomeController extends GetxController {
 
     try {
       isProcessingPayment.value = true;
+
+      // Ensure Publishable Key is initialized
+      Stripe.publishableKey = stripePublishableKey;
+      await Stripe.instance.applySettings();
 
       // 1. Create PaymentIntent on Stripe (10 USD = 1000 cents)
       final response = await http.post(
