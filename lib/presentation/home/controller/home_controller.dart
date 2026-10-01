@@ -10,8 +10,10 @@ import 'package:get/get.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 import 'package:uuid/uuid.dart';
+
 import '../../../../core/global/custom_text.dart';
 import '../data/model/chat_model.dart';
 import '../data/repositories/chat_repository.dart';
@@ -62,6 +64,7 @@ class HomeController extends GetxController {
     ever(authController.currentUser, (user) {
       if (user != null) {
         _listenToRecentSessions(user.uid);
+        _checkAndLoadProStatus(user.uid); // <-- ADDED: Automatically load Pro status when user opens app
       } else {
         createNewChat();
         recentSessions.clear();
@@ -78,6 +81,25 @@ class HomeController extends GetxController {
       isInputFocused.value = messageFocusNode.hasFocus;
     });
   }
+
+  // --- ADDED TWO METHODS TO SAVE AND LOAD PRO STATUS ---
+  Future<void> _checkAndLoadProStatus(String userId) async {
+    final prefs = await SharedPreferences.getInstance();
+    bool isPro = prefs.getBool('isPro_$userId') ?? false; // Check if this specific user bought pro before
+
+    if (isPro) {
+      isProPurchased.value = true;
+      selectedPlan.value = 'Pro';
+      selectedModel.value = 'gemini-2.5-flash';
+      _initGemini();
+    }
+  }
+
+  Future<void> _saveProStatus(String userId) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('isPro_$userId', true); // Save the purchase for this user permanently
+  }
+  // -----------------------------------------------------
 
   void onSelectPlan(String plan) {
     if (plan == 'General') {
@@ -264,6 +286,13 @@ class HomeController extends GetxController {
       isProPurchased.value = true;
       selectedPlan.value = 'Pro';
       selectedModel.value = 'gemini-2.5-flash';
+
+      // <-- ADDED: Save the purchase status forever locally after successful payment
+      final user = authController.currentUser.value;
+      if (user != null) {
+        await _saveProStatus(user.uid);
+      }
+
       _initGemini();
 
       Get.back(); // close upgrade modal

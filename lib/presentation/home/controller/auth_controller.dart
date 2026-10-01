@@ -22,7 +22,6 @@ class AuthController extends GetxController {
     try {
       isLoading.value = true;
       await authRepository.signInWithGoogle();
-
     } catch (e) {
       Get.snackbar('Login Failed', e.toString());
       log("$e");
